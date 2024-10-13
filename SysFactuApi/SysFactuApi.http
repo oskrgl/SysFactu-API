@@ -1,0 +1,6 @@
+@SysFactuApi_HostAddress = http://localhost:5158
+
+GET {{SysFactuApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
