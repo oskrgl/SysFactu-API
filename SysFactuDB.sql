@@ -35,7 +35,6 @@ CREATE TABLE area (
 CREATE TABLE articulo (
     idarticulo uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     idcategoria uniqueidentifier NOT NULL,
-    idproveedor uniqueidentifier NOT NULL,
     idarea uniqueidentifier NOT NULL,
     codigo varchar(50) NULL,
     tipo varchar(50) NOT NULL DEFAULT 'Unidad',
@@ -50,7 +49,6 @@ CREATE TABLE articulo (
     imagen varchar(MAX) NULL,
     estado bit DEFAULT 1,
     FOREIGN KEY (idcategoria) REFERENCES categoria(idcategoria),
-    FOREIGN KEY (idproveedor) REFERENCES proveedor(idproveedor),
     FOREIGN KEY (idarea) REFERENCES area(idarea)
 );
 
@@ -170,7 +168,7 @@ CREATE TABLE detalle_venta (
 );
 
 
-CREATE PROCEDURE sp_validar_login
+alter PROCEDURE sp_validar_login
     @Email VARCHAR(50),
     @Password VARCHAR(50)
 AS
@@ -179,18 +177,19 @@ BEGIN
     
     -- Obtener la contraseña hash almacenada
     select 
-		[idusuario]
-      ,[idrol]
-      ,[nombre]
-      ,[tipo_documento]
-      ,[num_documento]
-      ,[direccion]
-      ,[telefono]
-      ,[email]
-      ,[password]
-      ,[estado]
-	from [dbo].[usuario]
-	where [email] = @Email and [password] = HASHBYTES('SHA2_256', @Password)
+		u.[idusuario] as IdUsuario
+      ,u.[idrol] as IdRol
+      ,u.[nombre] as Nombre
+      ,u.[tipo_documento] as TipoDocumento
+      ,u.[num_documento] as NumDocumento
+      ,u.[direccion] as Direccion
+      ,u.[telefono] as Telefono
+      ,u.[email] as Email
+      ,u.[estado] as Estado
+	  ,r.[nombre] as Rol
+	from [dbo].[usuario] u
+	inner join rol r on u.idrol = r.idrol
+	where u.[email] = @Email and u.[password] = HASHBYTES('SHA2_256', @Password)
 END;
 
 alter PROCEDURE sp_InsertarProveedor
@@ -207,6 +206,27 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Verificar si el nombre ya existe
+    IF EXISTS (SELECT 1 FROM proveedor WHERE nombre = @Nombre)
+    BEGIN
+        -- Devolver mensaje de error si el nombre ya existe
+        THROW 50001, 'El nombre ya existe, no se puede duplicar.', 1;
+    END
+
+
     INSERT INTO proveedor (idproveedor, nombre, nombre_contacto, telefono_fijo, telefono_celular, correo, direccion, estado, fecha_r)
     VALUES (@IdProveedor, @Nombre, @NombreContacto, @TelefonoFijo, @TelefonoCelular, @Correo, @Direccion, @Estado, @FechaRegistro);
+
+	select 
+		[idproveedor] as IdProveedor
+		,[nombre] as Nombre
+		,[nombre_contacto] as NombreContacto
+		,[telefono_fijo] as TelefonoFijo
+		,[telefono_celular] as TelefonoCelular
+		,[correo] as Correo
+		,[direccion] as Direccion
+		,[estado] as Estado
+		,[fecha_r] as FechaRegistro
+	FROM proveedor
+	where [idproveedor] = @IdProveedor
 END;

@@ -8,5 +8,7 @@ namespace SysFactuApi.Domain.Interfaces
         Task<IEnumerable<Usuario>> GetStatesUsuario(string DBConnection, string SPname);
         Task<Usuario> ValidarUsuario(string DBConnection, string SPname, ValidarUsuario user);
         Task<Proveedor> AgregarProveedor(string DBConnection, string SPname, Proveedor user);
+        Task<IEnumerable<Proveedor>> getProveedores(string DBConnection, string SPname);
+        Task<Proveedor> updateProveedor(string DBConnection, string SPname, Proveedor user);
     }
 }

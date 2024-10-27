@@ -25,5 +25,17 @@ namespace SysFactuApi.Domain.Services
             string SPname = _globalVariables.SPAgregarProveedor;
             return await reportingService.AgregarProveedor(DBConnection, SPname, dara);
         }
+        public async Task<IEnumerable<Proveedor>> getProveedores()
+        {
+            string DBConnection = _globalVariables.DBConnection;
+            string SPname = _globalVariables.SPgetProveedores;
+            return await reportingService.getProveedores(DBConnection, SPname);
+        }
+        public async Task<Proveedor> updateProveedor(Proveedor dara)
+        {
+            string DBConnection = _globalVariables.DBConnection;
+            string SPname = _globalVariables.SPupdateProveedor;
+            return await reportingService.updateProveedor(DBConnection, SPname, dara);
+        }
     }
 }

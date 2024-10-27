@@ -1,6 +1,7 @@
 ﻿using SysFactuApi.Domain.Interfaces;
 using SysFactuApi.Domain.Models.ReportingModels;
 using SysFactuApi.Domain.Models.Requests;
+using System.Numerics;
 
 namespace SysFactuApi.CrossCutting.Repositories.Reporting
 {
@@ -18,6 +19,16 @@ namespace SysFactuApi.CrossCutting.Repositories.Reporting
         }
 
         public async Task<Proveedor> AgregarProveedor(string DBConnection, string SPname, Proveedor proveedorData)
+        {
+            var userDb = await GetAsyncFirstDynamic<Proveedor>(DBConnection, SPname, proveedorData, System.Data.CommandType.StoredProcedure);
+            return userDb?.FirstOrDefault();
+        }
+        public async Task<IEnumerable<Proveedor>> getProveedores(string DBConnection, string SPname)
+        {
+            var userDb = await GetAsyncFirstDynamic<Proveedor>(DBConnection, SPname, null, System.Data.CommandType.StoredProcedure);
+            return userDb;
+        }
+        public async Task<Proveedor> updateProveedor(string DBConnection, string SPname, Proveedor proveedorData)
         {
             var userDb = await GetAsyncFirstDynamic<Proveedor>(DBConnection, SPname, proveedorData, System.Data.CommandType.StoredProcedure);
             return userDb?.FirstOrDefault();

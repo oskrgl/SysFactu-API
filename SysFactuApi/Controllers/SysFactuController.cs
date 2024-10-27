@@ -24,52 +24,123 @@ namespace SysFactuApi.Controllers
         [HttpPost("ValidarUsuario")]
         public async Task<IActionResult> ValidarUsuario([FromBody] ValidarUsuario model)
         {
-            var usuario = await serviceDomain.ValidarUsuario(model);
-            Result<Usuario> result = new Result<Usuario>();
-            if (usuario != null)
+            try
             {
-                result.IsSuccess = true;
-                result.ReturnMessage = "Usuario encontrado";
-                result.Data = usuario;
-                return Ok(result);
+                var usuario = await serviceDomain.ValidarUsuario(model);
+                Result<Usuario> result = new Result<Usuario>();
+                if (usuario != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Usuario encontrado";
+                    result.Data = usuario;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Usuario no encontrado";
+                    return BadRequest(result);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                result.IsSuccess = false;
-                result.ReturnMessage = "Usuario no encontrado";
-                return BadRequest(result);
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
             }
         }
 
         [HttpPost("AgregarProveedor")]
         public async Task<IActionResult> AgregarProveedor([FromBody] Proveedor model)
         {
-            var dataResult = new Proveedor();
             try
             {
-                dataResult = await serviceDomain.AgregarProveedor(model);
+                var dataResult = await serviceDomain.AgregarProveedor(model);
+            
+                Result<Proveedor> result = new Result<Proveedor>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Proveedor registrado";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Proveedor no registrado";
+                    return BadRequest(result);
+                }
             }
             catch (Exception ex)
             {
-                Result<Exception> resultex = new Result<Exception>();
-                resultex.IsSuccess = true;
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
                 resultex.ReturnMessage = ex.Message;
-                resultex.Data = ex;
                 return Ok(resultex);
             }
-            Result<Proveedor> result = new Result<Proveedor>();
-            if (dataResult != null)
+        }
+
+        [HttpPost("getProveedores")]
+        public async Task<IActionResult> getProveedores()
+        {
+            try
             {
-                result.IsSuccess = true;
-                result.ReturnMessage = "Proveedor registrado";
-                result.Data = dataResult;
-                return Ok(result);
+                IEnumerable<Proveedor> dataResult = await serviceDomain.getProveedores();
+                dataResult = await serviceDomain.getProveedores();
+                Result<IEnumerable<Proveedor>> result = new Result<IEnumerable<Proveedor>>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Proveedor registrado";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Proveedor no registrado";
+                    return BadRequest(result);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                result.IsSuccess = false;
-                result.ReturnMessage = "Proveedor no registrado";
-                return BadRequest(result);
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+
+        [HttpPost("updateProveedor")]
+        public async Task<IActionResult> updateProveedor([FromBody] Proveedor model)
+        {
+            try
+            {
+                var dataResult = await serviceDomain.updateProveedor(model);
+                Result<Proveedor> result = new Result<Proveedor>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Proveedor modificado";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Proveedor no modificado";
+                    return BadRequest(result);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
             }
         }
     }
