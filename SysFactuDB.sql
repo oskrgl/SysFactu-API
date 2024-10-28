@@ -1,4 +1,5 @@
---USE [SysFactuDB]
+USE [SysFactuDB]
+GO
 
 CREATE TABLE categoria (
     idcategoria uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
@@ -7,6 +8,10 @@ CREATE TABLE categoria (
     estado bit DEFAULT 1
 );
 
+
+
+--TRUNCATE TABLE proveedor;
+--DELETE FROM proveedor;
 CREATE TABLE proveedor (
     idproveedor uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     nombre varchar(50) NOT NULL UNIQUE,
@@ -26,16 +31,8 @@ CREATE TABLE sucursal (
     telefono varchar(10) NOT NULL
 );
 
-CREATE TABLE area (
-    idarea uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    nombre varchar(100) NOT NULL,
-    descripcion varchar(256) NULL
-);
-
 CREATE TABLE articulo (
     idarticulo uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    idcategoria uniqueidentifier NOT NULL,
-    idarea uniqueidentifier NOT NULL,
     codigo varchar(50) NULL,
     tipo varchar(50) NOT NULL DEFAULT 'Unidad',
     nombre varchar(100) NOT NULL UNIQUE,
@@ -47,10 +44,18 @@ CREATE TABLE articulo (
     descripcion varchar(256) NULL,
     fecha_vencimiento datetime NULL DEFAULT NULL,
     imagen varchar(MAX) NULL,
-    estado bit DEFAULT 1,
-    FOREIGN KEY (idcategoria) REFERENCES categoria(idcategoria),
-    FOREIGN KEY (idarea) REFERENCES area(idarea)
+    estado bit DEFAULT 1
 );
+
+CREATE TABLE ArticuloCategoria (
+    idarticuloCategoria uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
+    idarticulo uniqueidentifier NOT NULL,
+    idcategoria uniqueidentifier NOT NULL,
+    cantidad integer NOT NULL,
+    FOREIGN KEY (idarticulo) REFERENCES articulo(idarticulo),
+    FOREIGN KEY (idcategoria) REFERENCES categoria(idcategoria)
+);
+
 
 CREATE TABLE ArticuloComponente (
     idArticuloPadre uniqueidentifier NOT NULL,
@@ -168,31 +173,29 @@ CREATE TABLE detalle_venta (
 );
 
 
-alter PROCEDURE sp_validar_login
+create PROCEDURE sp_validar_login
     @Email VARCHAR(50),
     @Password VARCHAR(50)
-AS
-BEGIN
-    DECLARE @hashed_password VARBINARY(64);
-    
-    -- Obtener la contraseña hash almacenada
-    select 
+	AS
+BEGIN    
+	-- Obtener la contraseña hash almacenada
+	select 
 		u.[idusuario] as IdUsuario
-      ,u.[idrol] as IdRol
-      ,u.[nombre] as Nombre
-      ,u.[tipo_documento] as TipoDocumento
-      ,u.[num_documento] as NumDocumento
-      ,u.[direccion] as Direccion
-      ,u.[telefono] as Telefono
-      ,u.[email] as Email
-      ,u.[estado] as Estado
-	  ,r.[nombre] as Rol
+		,u.[idrol] as IdRol
+		,u.[nombre] as Nombre
+		,u.[tipo_documento] as TipoDocumento
+		,u.[num_documento] as NumDocumento
+		,u.[direccion] as Direccion
+		,u.[telefono] as Telefono
+		,u.[email] as Email
+		,u.[estado] as Estado
+		,r.[nombre] as Rol
 	from [dbo].[usuario] u
 	inner join rol r on u.idrol = r.idrol
 	where u.[email] = @Email and u.[password] = HASHBYTES('SHA2_256', @Password)
 END;
 
-alter PROCEDURE sp_InsertarProveedor
+create PROCEDURE sp_InsertarProveedor
     @IdProveedor UNIQUEIDENTIFIER,
     @Nombre NVARCHAR(50),
     @NombreContacto NVARCHAR(50) = NULL,
@@ -229,4 +232,222 @@ BEGIN
 		,[fecha_r] as FechaRegistro
 	FROM proveedor
 	where [idproveedor] = @IdProveedor
+END;
+
+create PROCEDURE sp_getProveedores
+AS
+BEGIN
+    
+    -- Obtener la contraseña hash almacenada
+    select 
+		[idproveedor] as IdProveedor
+		,[nombre] as Nombre
+		,[nombre_contacto] as NombreContacto
+		,[telefono_fijo] as TelefonoFijo
+		,[telefono_celular] as TelefonoCelular
+		,[correo] as Correo
+		,[direccion] as Direccion
+		,[estado] as Estado
+		,[fecha_r] as FechaRegistro
+	FROM proveedor
+END;
+
+create PROCEDURE sp_UpdateProveedo
+    @IdProveedor UNIQUEIDENTIFIER,
+    @Nombre NVARCHAR(50),
+    @NombreContacto NVARCHAR(50) = NULL,
+    @TelefonoFijo NVARCHAR(10) = NULL,
+    @TelefonoCelular NVARCHAR(10) = NULL,
+    @Correo NVARCHAR(50) = NULL,
+    @Estado NVARCHAR(50) = NULL, 
+    @FechaRegistro datetime = NULL, 
+    @Direccion NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar si el nombre ya existe en otro proveedor
+    IF EXISTS (SELECT 1 FROM proveedor WHERE nombre = @Nombre AND idproveedor <> @IdProveedor)
+    BEGIN
+        -- Devolver mensaje de error si el nombre ya existe
+        THROW 50001, 'El nombre ya existe, no se puede duplicar.', 1;
+    END
+
+    -- Actualizar proveedor existente
+    UPDATE proveedor
+    SET
+        nombre = @Nombre,
+        nombre_contacto = @NombreContacto,
+        telefono_fijo = @TelefonoFijo,
+        telefono_celular = @TelefonoCelular,
+        correo = @Correo,
+        direccion = @Direccion,
+        estado = @Estado
+    WHERE idproveedor = @IdProveedor;
+
+    -- Devolver los detalles del proveedor actualizado
+    SELECT
+        idproveedor AS IdProveedor,
+        nombre AS Nombre,
+        nombre_contacto AS NombreContacto,
+        telefono_fijo AS TelefonoFijo,
+        telefono_celular AS TelefonoCelular,
+        correo AS Correo,
+        direccion AS Direccion,
+        estado AS Estado,
+        fecha_r AS FechaRegistro
+    FROM proveedor
+    WHERE idproveedor = @IdProveedor;
+END;
+
+create PROCEDURE sp_InsertarCategoria
+    @idCategoria UNIQUEIDENTIFIER,
+    @Nombre NVARCHAR(50),
+    @Descripcion NVARCHAR(256) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar si el nombre ya existe
+    IF EXISTS (SELECT 1 FROM categoria WHERE nombre = @Nombre)
+    BEGIN
+        -- Devolver mensaje de error si el nombre ya existe
+        THROW 50001, 'El nombre ya existe, no se puede duplicar.', 1;
+    END
+
+
+    INSERT INTO categoria (idcategoria, nombre, descripcion)
+    VALUES (@idCategoria, @Nombre, @Descripcion);
+
+	select 
+		[idcategoria] as idCategoria
+		,[nombre] as Nombre
+		,[descripcion] as Descripcion
+	FROM categoria
+	where [idcategoria] = @idCategoria
+END;
+
+
+create PROCEDURE sp_getCategoria
+AS
+BEGIN
+    
+    select 
+		[idcategoria] as idCategoria
+		,[nombre] as Nombre
+		,[descripcion] as Descripcion
+	FROM categoria
+END;
+
+create PROCEDURE sp_UpdateCategoria
+    @idCategoria UNIQUEIDENTIFIER,
+    @Nombre NVARCHAR(50),
+    @Descripcion NVARCHAR(256) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar si el nombre ya existe en otro proveedor
+    IF EXISTS (SELECT 1 FROM categoria WHERE nombre = @Nombre AND idcategoria <> @idCategoria)
+    BEGIN
+        -- Devolver mensaje de error si el nombre ya existe
+        THROW 50001, 'El nombre ya existe, no se puede duplicar.', 1;
+    END
+
+    -- Actualizar proveedor existente
+    UPDATE categoria
+    SET
+        nombre = @Nombre,
+        descripcion = @Descripcion
+    WHERE idcategoria = @idCategoria;
+
+    -- Devolver los detalles del proveedor actualizado
+    select 
+		[idcategoria] as idCategoria
+		,[nombre] as Nombre
+		,[descripcion] as Descripcion
+	FROM categoria
+    WHERE idcategoria = @idCategoria;
+END;
+
+
+--idsucursal uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
+--    nombre varchar(100) NOT NULL,
+--    direccion varchar(100) NOT NULL,
+--    telefono varchar(10) NOT NULL
+
+create PROCEDURE sp_InsertarSucursal
+    @IdSucursal UNIQUEIDENTIFIER,
+    @Nombre NVARCHAR(100),
+    @Telefono NVARCHAR(10) = NULL,
+    @Direccion NVARCHAR(100) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar si el nombre ya existe
+    IF EXISTS (SELECT 1 FROM sucursal WHERE nombre = @Nombre)
+    BEGIN
+        -- Devolver mensaje de error si el nombre ya existe
+        THROW 50001, 'El nombre ya existe, no se puede duplicar.', 1;
+    END
+
+
+    INSERT INTO sucursal (idsucursal, nombre, telefono, direccion)
+    VALUES (@IdSucursal, @Nombre, @Telefono, @Direccion);
+
+	select 
+		[idsucursal] as IdSucursal
+		,[nombre] as Nombre
+		,[telefono] as Telefono
+		,[direccion] as Direccion
+	FROM sucursal
+	where [idsucursal] = @IdSucursal
+END;
+
+
+create PROCEDURE sp_getSucursal
+AS
+BEGIN
+    
+    select 
+		[idsucursal] as IdSucursal
+		,[nombre] as Nombre
+		,[telefono] as Telefono
+		,[direccion] as Direccion
+	FROM sucursal
+END;
+
+create PROCEDURE sp_UpdateSucursal
+    @IdSucursal UNIQUEIDENTIFIER,
+    @Nombre NVARCHAR(100),
+    @Telefono NVARCHAR(10) = NULL,
+    @Direccion NVARCHAR(100) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar si el nombre ya existe en otro proveedor
+    IF EXISTS (SELECT 1 FROM sucursal WHERE nombre = @Nombre AND idsucursal <> @IdSucursal)
+    BEGIN
+        -- Devolver mensaje de error si el nombre ya existe
+        THROW 50001, 'El nombre ya existe, no se puede duplicar.', 1;
+    END
+
+    -- Actualizar proveedor existente
+    UPDATE sucursal
+    SET
+        nombre = @Nombre,
+        telefono = @Telefono,
+        direccion = @Direccion
+    WHERE idsucursal = @IdSucursal;
+
+    -- Devolver los detalles del proveedor actualizado
+    select 
+		[idsucursal] as IdSucursal
+		,[nombre] as Nombre
+		,[telefono] as Telefono
+		,[direccion] as Direccion
+	FROM sucursal
+    WHERE [idsucursal] = @IdSucursal;
 END;

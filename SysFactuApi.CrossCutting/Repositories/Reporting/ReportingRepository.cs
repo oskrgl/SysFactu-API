@@ -33,5 +33,35 @@ namespace SysFactuApi.CrossCutting.Repositories.Reporting
             var userDb = await GetAsyncFirstDynamic<Proveedor>(DBConnection, SPname, proveedorData, System.Data.CommandType.StoredProcedure);
             return userDb?.FirstOrDefault();
         }
+        public async Task<Categoria> AgregarCategoria(string DBConnection, string SPname, Categoria proveedorData)
+        {
+            var userDb = await GetAsyncFirstDynamic<Categoria>(DBConnection, SPname, proveedorData, System.Data.CommandType.StoredProcedure);
+            return userDb?.FirstOrDefault();
+        }
+        public async Task<IEnumerable<Categoria>> getCategoria(string DBConnection, string SPname)
+        {
+            var userDb = await GetAsyncFirstDynamic<Categoria>(DBConnection, SPname, null, System.Data.CommandType.StoredProcedure);
+            return userDb;
+        }
+        public async Task<Categoria> updateCategoria(string DBConnection, string SPname, Categoria proveedorData)
+        {
+            var userDb = await GetAsyncFirstDynamic<Categoria>(DBConnection, SPname, proveedorData, System.Data.CommandType.StoredProcedure);
+            return userDb?.FirstOrDefault();
+        }
+        public async Task<Sucursal> AgregarSucursal(string DBConnection, string SPname, Sucursal proveedorData)
+        {
+            var userDb = await GetAsyncFirstDynamic<Sucursal>(DBConnection, SPname, proveedorData, System.Data.CommandType.StoredProcedure);
+            return userDb?.FirstOrDefault();
+        }
+        public async Task<IEnumerable<Sucursal>> getSucursal(string DBConnection, string SPname)
+        {
+            var userDb = await GetAsyncFirstDynamic<Sucursal>(DBConnection, SPname, null, System.Data.CommandType.StoredProcedure);
+            return userDb;
+        }
+        public async Task<Sucursal> updateSucursal(string DBConnection, string SPname, Sucursal proveedorData)
+        {
+            var userDb = await GetAsyncFirstDynamic<Sucursal>(DBConnection, SPname, proveedorData, System.Data.CommandType.StoredProcedure);
+            return userDb?.FirstOrDefault();
+        }
     }
 }

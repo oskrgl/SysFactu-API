@@ -7,5 +7,11 @@
         public string SPAgregarProveedor { get; set; }
         public string SPgetProveedores { get; set; }
         public string SPupdateProveedor { get; set; }
+        public string SPAgregarCategoria { get; set; }
+        public string SPgetCategoria { get; set; }
+        public string SPupdateCategoria { get; set; }
+        public string SPAgregarSucursal { get; set; }
+        public string SPgetSucursal { get; set; }
+        public string SPupdateSucursal { get; set; }
     }
 }

@@ -88,7 +88,6 @@ namespace SysFactuApi.Controllers
             try
             {
                 IEnumerable<Proveedor> dataResult = await serviceDomain.getProveedores();
-                dataResult = await serviceDomain.getProveedores();
                 Result<IEnumerable<Proveedor>> result = new Result<IEnumerable<Proveedor>>();
                 if (dataResult != null)
                 {
@@ -131,6 +130,186 @@ namespace SysFactuApi.Controllers
                 {
                     result.IsSuccess = false;
                     result.ReturnMessage = "Proveedor no modificado";
+                    return BadRequest(result);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+        [HttpPost("AgregarCategoria")]
+        public async Task<IActionResult> AgregarCategoria([FromBody] Categoria model)
+        {
+            try
+            {
+                var dataResult = await serviceDomain.AgregarCategoria(model);
+                Result<Categoria> result = new Result<Categoria>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Categoría registrada";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Categoría no registrada";
+                    return BadRequest(result);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+        [HttpPost("getCategorias")]
+        public async Task<IActionResult> getCategorias()
+        {
+            try
+            {
+                IEnumerable<Categoria> dataResult = await serviceDomain.getCategorias();
+                Result<IEnumerable<Categoria>> result = new Result<IEnumerable<Categoria>>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Categoría encontrada";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Categoría no encontrada";
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+
+        [HttpPost("updateCategoria")]
+        public async Task<IActionResult> updateCategoria([FromBody] Categoria model)
+        {
+            try
+            {
+                var dataResult = await serviceDomain.updateCategoria(model);
+                Result<Categoria> result = new Result<Categoria>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Categoría modificada";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Categoría no modificada";
+                    return BadRequest(result);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+        [HttpPost("AgregarSucursal")]
+        public async Task<IActionResult> AgregarSucursal([FromBody] Sucursal model)
+        {
+            try
+            {
+                var dataResult = await serviceDomain.AgregarSucursal(model);
+                Result<Sucursal> result = new Result<Sucursal>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Sucursal registrada";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Sucursal no registrada";
+                    return BadRequest(result);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+        [HttpPost("getSucursales")]
+        public async Task<IActionResult> getSucursales()
+        {
+            try
+            {
+                IEnumerable<Sucursal> dataResult = await serviceDomain.getSucursales();
+                Result<IEnumerable<Sucursal>> result = new Result<IEnumerable<Sucursal>>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Sucursal encontrada";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Sucursal no encontrada";
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+
+        [HttpPost("updateSucursal")]
+        public async Task<IActionResult> updateSucursal([FromBody] Sucursal model)
+        {
+            try
+            {
+                var dataResult = await serviceDomain.updateSucursal(model);
+                Result<Sucursal> result = new Result<Sucursal>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Sucursal modificada";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Sucursal no modificada";
                     return BadRequest(result);
                 }
             }
