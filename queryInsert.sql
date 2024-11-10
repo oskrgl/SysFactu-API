@@ -1,3 +1,7 @@
+USE [SysFactuDB]
+GO
+
+
 -- Insert data into the 'categoria' table
 INSERT INTO categoria (idcategoria, nombre, descripcion, estado) VALUES
 (NEWID(), 'Lácteos', 'Descripción de lácteos', 1),

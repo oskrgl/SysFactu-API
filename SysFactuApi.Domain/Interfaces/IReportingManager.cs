@@ -16,5 +16,7 @@ namespace SysFactuApi.Domain.Interfaces
         Task<Sucursal> AgregarSucursal(string DBConnection, string SPname, Sucursal data);
         Task<IEnumerable<Sucursal>> getSucursal(string DBConnection, string SPname);
         Task<Sucursal> updateSucursal(string DBConnection, string SPname, Sucursal data);
+        Task<Producto> AgregarProducto(string DBConnection, string SPname, Producto data);
+        Task<IEnumerable<ProductoCategoria>> AgregarProductotoCategoria(string DBConnection, string SPname, IEnumerable<ProductoCategoria> data);
     }
 }

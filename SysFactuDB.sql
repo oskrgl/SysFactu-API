@@ -7,7 +7,7 @@ CREATE TABLE categoria (
     descripcion varchar(256) NULL,
     estado bit DEFAULT 1
 );
-
+GO
 
 
 --TRUNCATE TABLE proveedor;
@@ -23,22 +23,20 @@ CREATE TABLE proveedor (
     estado varchar(255) NULL DEFAULT 'activo',  -- Estado por defecto en 'activo'
     fecha_r datetime DEFAULT GETDATE()  -- Fecha de registro por defecto en la fecha de hoy
 );
-
+GO
 CREATE TABLE sucursal (
     idsucursal uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     nombre varchar(100) NOT NULL,
     direccion varchar(100) NOT NULL,
     telefono varchar(10) NOT NULL
 );
-
-CREATE TABLE articulo (
-    idarticulo uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
+GO
+CREATE TABLE producto (
+    idproducto uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     codigo varchar(50) NULL,
-    tipo varchar(50) NOT NULL DEFAULT 'Unidad',
     nombre varchar(100) NOT NULL UNIQUE,
     precio_venta decimal(11,2) NOT NULL,
     costo decimal(11,2) NOT NULL,
-    precio decimal(11,2) NOT NULL,
     ganancia decimal(11,2) NOT NULL,
     stock integer NOT NULL,
     descripcion varchar(256) NULL,
@@ -46,35 +44,35 @@ CREATE TABLE articulo (
     imagen varchar(MAX) NULL,
     estado bit DEFAULT 1
 );
+GO
 
-CREATE TABLE ArticuloCategoria (
-    idarticuloCategoria uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    idarticulo uniqueidentifier NOT NULL,
+CREATE TABLE producto_categoria (
+    idproductoCategoria uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
+    idproducto uniqueidentifier NOT NULL,
     idcategoria uniqueidentifier NOT NULL,
-    cantidad integer NOT NULL,
-    FOREIGN KEY (idarticulo) REFERENCES articulo(idarticulo),
+    FOREIGN KEY (idproducto) REFERENCES producto(idproducto),
     FOREIGN KEY (idcategoria) REFERENCES categoria(idcategoria)
 );
+GO
 
-
-CREATE TABLE ArticuloComponente (
-    idArticuloPadre uniqueidentifier NOT NULL,
-    idArticuloHijo uniqueidentifier NOT NULL,
+CREATE TABLE producto_componente (
+    idproductoPadre uniqueidentifier NOT NULL,
+    idproductoHijo uniqueidentifier NOT NULL,
     cantidad integer NOT NULL,
-    PRIMARY KEY (idArticuloPadre, idArticuloHijo),
-    FOREIGN KEY (idArticuloPadre) REFERENCES articulo(idarticulo),
-    FOREIGN KEY (idArticuloHijo) REFERENCES articulo(idarticulo)
+    PRIMARY KEY (idproductoPadre, idproductoHijo),
+    FOREIGN KEY (idproductoPadre) REFERENCES producto(idproducto),
+    FOREIGN KEY (idproductoHijo) REFERENCES producto(idproducto)
 );
-
+GO
 CREATE TABLE stock (
     idstock uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    idarticulo uniqueidentifier NOT NULL,
+    idproducto uniqueidentifier NOT NULL,
     idsucursal uniqueidentifier NOT NULL,
     cantidad integer NOT NULL,
-    FOREIGN KEY (idarticulo) REFERENCES articulo(idarticulo),
+    FOREIGN KEY (idproducto) REFERENCES producto(idproducto),
     FOREIGN KEY (idsucursal) REFERENCES sucursal(idsucursal)
 );
-
+GO
 CREATE TABLE persona (
     idpersona uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     tipo_persona varchar(20) NOT NULL,
@@ -95,14 +93,14 @@ CREATE TABLE persona (
     fcf varchar(20) NULL,
     ccf varchar(20) NULL
 );
-
+GO
 CREATE TABLE rol (
     idrol uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     nombre varchar(30) NOT NULL,
     descripcion varchar(100) NULL,
     estado bit DEFAULT 1
 );
-
+GO
 CREATE TABLE usuario (
     idusuario uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     idrol uniqueidentifier NOT NULL,
@@ -116,7 +114,7 @@ CREATE TABLE usuario (
     estado bit DEFAULT 1,
     FOREIGN KEY (idrol) REFERENCES rol(idrol)
 );
-
+GO
 CREATE TABLE ingreso (
     idingreso uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     idproveedor uniqueidentifier NOT NULL,
@@ -133,17 +131,17 @@ CREATE TABLE ingreso (
     FOREIGN KEY (idusuario) REFERENCES usuario (idusuario),
     FOREIGN KEY (idsucursal) REFERENCES sucursal (idsucursal)
 );
-
+GO
 CREATE TABLE detalle_ingreso (
     iddetalle_ingreso uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     idingreso uniqueidentifier NOT NULL,
-    idarticulo uniqueidentifier NOT NULL,
+    idproducto uniqueidentifier NOT NULL,
     cantidad integer NOT NULL,
     precio decimal(11,2) NOT NULL,
     FOREIGN KEY (idingreso) REFERENCES ingreso (idingreso) ON DELETE CASCADE,
-    FOREIGN KEY (idarticulo) REFERENCES articulo (idarticulo)
+    FOREIGN KEY (idproducto) REFERENCES producto (idproducto)
 );
-
+GO
 CREATE TABLE venta (
     idventa uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     idcliente uniqueidentifier NOT NULL,
@@ -160,22 +158,22 @@ CREATE TABLE venta (
     FOREIGN KEY (idusuario) REFERENCES usuario (idusuario),
     FOREIGN KEY (idsucursal) REFERENCES sucursal (idsucursal)
 );
-
+GO
 CREATE TABLE detalle_venta (
     iddetalle_venta uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     idventa uniqueidentifier NOT NULL,
-    idarticulo uniqueidentifier NOT NULL,
+    idproducto uniqueidentifier NOT NULL,
     cantidad integer NOT NULL,
     precio decimal(11,2) NOT NULL,
     descuento decimal(11,2) NOT NULL,
     FOREIGN KEY (idventa) REFERENCES venta (idventa) ON DELETE CASCADE,
-    FOREIGN KEY (idarticulo) REFERENCES articulo (idarticulo)
+    FOREIGN KEY (idproducto) REFERENCES producto (idproducto)
 );
-
-
+GO
+/*****************************111111111****************************/
 create PROCEDURE sp_validar_login
-    @Email VARCHAR(50),
-    @Password VARCHAR(50)
+	@Email VARCHAR(50),
+	@Password VARCHAR(50)
 	AS
 BEGIN    
 	-- Obtener la contraseña hash almacenada
@@ -194,7 +192,9 @@ BEGIN
 	inner join rol r on u.idrol = r.idrol
 	where u.[email] = @Email and u.[password] = HASHBYTES('SHA2_256', @Password)
 END;
-
+GO
+	
+/*******************************222222222222**************************/
 create PROCEDURE sp_InsertarProveedor
     @IdProveedor UNIQUEIDENTIFIER,
     @Nombre NVARCHAR(50),
@@ -231,9 +231,10 @@ BEGIN
 		,[estado] as Estado
 		,[fecha_r] as FechaRegistro
 	FROM proveedor
-	where [idproveedor] = @IdProveedor
+	where [idproveedor] = @IdProveedor;
 END;
-
+GO
+/*******************************3333333**************************/
 create PROCEDURE sp_getProveedores
 AS
 BEGIN
@@ -251,8 +252,9 @@ BEGIN
 		,[fecha_r] as FechaRegistro
 	FROM proveedor
 END;
-
-create PROCEDURE sp_UpdateProveedo
+GO
+/*********************************4444444444************************/
+create PROCEDURE sp_UpdateProveedor
     @IdProveedor UNIQUEIDENTIFIER,
     @Nombre NVARCHAR(50),
     @NombreContacto NVARCHAR(50) = NULL,
@@ -299,7 +301,8 @@ BEGIN
     FROM proveedor
     WHERE idproveedor = @IdProveedor;
 END;
-
+GO
+/***********************************55555555555**********************/
 create PROCEDURE sp_InsertarCategoria
     @idCategoria UNIQUEIDENTIFIER,
     @Nombre NVARCHAR(50),
@@ -326,7 +329,8 @@ BEGIN
 	FROM categoria
 	where [idcategoria] = @idCategoria
 END;
-
+GO
+/*******************************6666666666**************************/
 
 create PROCEDURE sp_getCategoria
 AS
@@ -338,7 +342,8 @@ BEGIN
 		,[descripcion] as Descripcion
 	FROM categoria
 END;
-
+GO
+/***************************7777777777******************************/
 create PROCEDURE sp_UpdateCategoria
     @idCategoria UNIQUEIDENTIFIER,
     @Nombre NVARCHAR(50),
@@ -369,7 +374,8 @@ BEGIN
 	FROM categoria
     WHERE idcategoria = @idCategoria;
 END;
-
+GO
+/***************************8888888888******************************/
 
 --idsucursal uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
 --    nombre varchar(100) NOT NULL,
@@ -404,7 +410,8 @@ BEGIN
 	FROM sucursal
 	where [idsucursal] = @IdSucursal
 END;
-
+GO
+/********************************999999999*************************/
 
 create PROCEDURE sp_getSucursal
 AS
@@ -417,7 +424,8 @@ BEGIN
 		,[direccion] as Direccion
 	FROM sucursal
 END;
-
+GO
+/********************  10 10 10 10  *************************************/
 create PROCEDURE sp_UpdateSucursal
     @IdSucursal UNIQUEIDENTIFIER,
     @Nombre NVARCHAR(100),
@@ -451,3 +459,101 @@ BEGIN
 	FROM sucursal
     WHERE [idsucursal] = @IdSucursal;
 END;
+GO
+/********************  11 11 11 11  *************************************/
+
+CREATE PROCEDURE sp_InsertarProducto
+    @IdProducto UNIQUEIDENTIFIER,
+    @Codigo VARCHAR(50) = NULL,
+    @Nombre VARCHAR(100),
+    @PrecioVenta DECIMAL(11,2),
+    @Costo DECIMAL(11,2),
+    @Ganancia DECIMAL(11,2),
+    @Stock INT,
+    @Descripcion VARCHAR(256) = NULL,
+    @FechaVencimiento DATETIME = NULL,
+    @Imagen VARCHAR(MAX) = NULL,
+    @Estado BIT = 1
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar si el nombre ya existe
+    IF EXISTS (SELECT 1 FROM producto WHERE nombre = @Nombre)
+    BEGIN
+        RAISERROR('El nombre del producto ya existe.', 16, 1);
+        RETURN;
+    END
+
+    -- Insertar el nuevo producto
+    INSERT INTO producto (
+        idproducto,
+        codigo,
+        nombre,
+        precio_venta,
+        costo,
+        ganancia,
+        stock,
+        descripcion,
+        fecha_vencimiento,
+        imagen,
+        estado
+    )
+    VALUES (
+        @IdProducto,
+        @Codigo,
+        @Nombre,
+        @PrecioVenta,
+        @Costo,
+        @Ganancia,
+        @Stock,
+        @Descripcion,
+        @FechaVencimiento,
+        @Imagen,
+        @Estado
+    );
+
+    -- Confirmación de inserción exitosa
+    select 
+		idproducto as IdProducto,
+		codigo as Codigo,
+		nombre as  Nombre,
+		precio_venta as  PrecioVenta,
+		costo as Costo,
+		ganancia as Ganancia,
+		stock as Stock,
+		descripcion as Descripcion,
+		fecha_vencimiento as FechaVencimiento,
+		imagen as Imagen,
+		estado as Estado
+	FROM producto
+	where idproducto = @IdProducto
+END;
+GO
+/********************  12 12 12 12  *************************************/
+
+CREATE PROCEDURE sp_InsertarProductotoCategoria
+    @idproducto UNIQUEIDENTIFIER,
+    @json NVARCHAR(MAX)
+AS
+BEGIN
+    -- Eliminar registros anteriores para el producto especificado
+    DELETE FROM producto_categoria
+    WHERE idproducto = @idproducto;
+
+    -- Insertar nuevos registros desde JSON
+    INSERT INTO producto_categoria (idproductoCategoria, idproducto, idcategoria)
+    SELECT NEWID(), @idproducto, idcategoria
+    FROM OPENJSON(@json)
+    WITH (
+        idcategoria UNIQUEIDENTIFIER
+    );
+
+	select 
+		idproductoCategoria as IdProductoCategoria
+		,idproducto as IdProducto
+		,idcategoria as IdCategoria
+	FROM producto_categoria
+	where [idproducto] = @idproducto
+END;
+GO

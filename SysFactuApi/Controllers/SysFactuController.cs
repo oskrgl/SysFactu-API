@@ -322,5 +322,65 @@ namespace SysFactuApi.Controllers
                 return Ok(resultex);
             }
         }
+        [HttpPost("AgregarProducto")]
+        public async Task<IActionResult> AgregarProducto([FromBody] Producto model)
+        {
+            try
+            {
+                var dataResult = await serviceDomain.AgregarProducto(model);
+                Result<Producto> result = new Result<Producto>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Producto registrado";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Producto no registrado";
+                    return BadRequest(result);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+        [HttpPost("AgregarProductotoCategoria")]
+        public async Task<IActionResult> AgregarProductotoCategoria([FromBody] IEnumerable<ProductoCategoria> model)
+        {
+            try
+            {
+                var dataResult = await serviceDomain.AgregarProductotoCategoria(model);
+                Result<IEnumerable<ProductoCategoria>> result = new Result<IEnumerable<ProductoCategoria>>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Producto registrado";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Producto no registrado";
+                    return BadRequest(result);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
     }
 }

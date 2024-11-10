@@ -73,5 +73,17 @@ namespace SysFactuApi.Domain.Services
             string SPname = _globalVariables.SPupdateSucursal;
             return await reportingService.updateSucursal(DBConnection, SPname, data);
         }
+        public async Task<Producto> AgregarProducto(Producto data)
+        {
+            string DBConnection = _globalVariables.DBConnection;
+            string SPname = _globalVariables.SPAgregarProducto;
+            return await reportingService.AgregarProducto(DBConnection, SPname, data);
+        }
+        public async Task<IEnumerable<ProductoCategoria>> AgregarProductotoCategoria(IEnumerable<ProductoCategoria> data)
+        {
+            string DBConnection = _globalVariables.DBConnection;
+            string SPname = _globalVariables.SPAgregarProductotoCategoria;
+            return await reportingService.AgregarProductotoCategoria(DBConnection, SPname, data);
+        }
     }
 }

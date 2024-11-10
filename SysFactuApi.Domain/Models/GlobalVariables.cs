@@ -13,5 +13,7 @@
         public string SPAgregarSucursal { get; set; }
         public string SPgetSucursal { get; set; }
         public string SPupdateSucursal { get; set; }
+        public string SPAgregarProducto { get; set; }
+        public string SPAgregarProductotoCategoria { get; set; }
     }
 }
