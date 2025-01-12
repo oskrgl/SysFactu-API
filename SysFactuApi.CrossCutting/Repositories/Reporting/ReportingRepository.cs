@@ -59,6 +59,11 @@ namespace SysFactuApi.CrossCutting.Repositories.Reporting
             var userDb = await GetAsyncFirstDynamic<Sucursal>(DBConnection, SPname, null, System.Data.CommandType.StoredProcedure);
             return userDb;
         }
+        public async Task<IEnumerable<Producto>> getProducto(string DBConnection, string SPname)
+        {
+            var userDb = await GetAsyncFirstDynamic<Producto>(DBConnection, SPname, null, System.Data.CommandType.StoredProcedure);
+            return userDb;
+        }
         public async Task<Sucursal> updateSucursal(string DBConnection, string SPname, Sucursal objetData)
         {
             var userDb = await GetAsyncFirstDynamic<Sucursal>(DBConnection, SPname, objetData, System.Data.CommandType.StoredProcedure);
@@ -78,6 +83,17 @@ namespace SysFactuApi.CrossCutting.Repositories.Reporting
             };
 
             var userDb = await GetAsyncFirstDynamic<ProductoCategoria>(DBConnection, SPname, productoCategoriaData, System.Data.CommandType.StoredProcedure);
+            return userDb;
+        }
+        public async Task<dynamic> AgregarCompra(string DBConnection, string SPname, Compra datos)
+        {
+            var jsonCompra = new
+            {
+                idCompra = Guid.NewGuid(),
+                jsonCompra = JsonConvert.SerializeObject(datos)
+            };
+
+            var userDb = await GetAsyncFirstDynamic<dynamic>(DBConnection, SPname, jsonCompra, System.Data.CommandType.StoredProcedure);
             return userDb;
         }
 

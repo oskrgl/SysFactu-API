@@ -67,6 +67,12 @@ namespace SysFactuApi.Domain.Services
             string SPname = _globalVariables.SPgetSucursal;
             return await reportingService.getSucursal(DBConnection, SPname);
         }
+        public async Task<IEnumerable<Producto>> getProductos()
+        {
+            string DBConnection = _globalVariables.DBConnection;
+            string SPname = _globalVariables.SPgetProducto;
+            return await reportingService.getProducto(DBConnection, SPname);
+        }
         public async Task<Sucursal> updateSucursal(Sucursal data)
         {
             string DBConnection = _globalVariables.DBConnection;
@@ -84,6 +90,12 @@ namespace SysFactuApi.Domain.Services
             string DBConnection = _globalVariables.DBConnection;
             string SPname = _globalVariables.SPAgregarProductotoCategoria;
             return await reportingService.AgregarProductotoCategoria(DBConnection, SPname, data);
+        }
+        public async Task<Usuario> AgregarCompra(Compra user)
+        {
+            string DBConnection = _globalVariables.DBConnection;
+            string SPname = _globalVariables.SPAgregarCompra;
+            return await reportingService.AgregarCompra(DBConnection, SPname, user);
         }
     }
 }

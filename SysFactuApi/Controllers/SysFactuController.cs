@@ -382,5 +382,63 @@ namespace SysFactuApi.Controllers
                 return Ok(resultex);
             }
         }
+        [HttpPost("getProductos")]
+        public async Task<IActionResult> getProductos()
+        {
+            try
+            {
+                IEnumerable<Producto> dataResult = await serviceDomain.getProductos();
+                Result<IEnumerable<Producto>> result = new Result<IEnumerable<Producto>>();
+                if (dataResult != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Sucursal encontrada";
+                    result.Data = dataResult;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Sucursal no encontrada";
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
+        [HttpPost("AgregarCompra")]
+        public async Task<IActionResult> AgregarCompra([FromBody] Compra model)
+        {
+            try
+            {
+                var usuario = await serviceDomain.AgregarCompra(model);
+                Result<dynamic> result = new Result<dynamic>();
+                if (usuario != null)
+                {
+                    result.IsSuccess = true;
+                    result.ReturnMessage = "Usuario encontrado";
+                    result.Data = usuario;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.IsSuccess = false;
+                    result.ReturnMessage = "Usuario no encontrado";
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Result<dynamic> resultex = new Result<dynamic>();
+                resultex.IsSuccess = false;
+                resultex.ReturnMessage = ex.Message;
+                return Ok(resultex);
+            }
+        }
     }
 }

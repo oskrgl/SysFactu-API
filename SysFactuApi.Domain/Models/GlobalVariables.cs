@@ -15,5 +15,7 @@
         public string SPupdateSucursal { get; set; }
         public string SPAgregarProducto { get; set; }
         public string SPAgregarProductotoCategoria { get; set; }
+        public string SPgetProducto { get; set; }
+        public string SPAgregarCompra { get; set; }
     }
 }
